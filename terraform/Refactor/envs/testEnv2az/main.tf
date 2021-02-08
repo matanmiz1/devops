@@ -80,18 +80,6 @@ module "create_private_ec2" {
   tags            = { Name = "Pri_EC2_${var.suffix}"}
 }
 
-output "out_all_vpc_info" {
-  value = module.create_vpc.*
-}
-
-output "out_all_public_ec2_info" {
-  value = module.create_public_ec2.*
-}
-
-output "out_all_private_ec2_info" {
-  value = module.create_private_ec2.*
-}
-
 /*
 # Create elasitc IP for the NAT Gateway
 resource "aws_eip" "eip_nat_gateway" {
@@ -109,10 +97,20 @@ resource "aws_nat_gateway" "nat_gw" {
     Name = "NAT_GW_test"
   }
 }
-*/
 
-/*
 output "nat_gateway_ip" {
   value = aws_nat_gateway.nat_gw.public_ip
 }
 */
+
+output "out_all_vpc_info" {
+  value = module.create_vpc.*
+}
+
+output "out_all_public_ec2_info" {
+  value = module.create_public_ec2.*
+}
+
+output "out_all_private_ec2_info" {
+  value = module.create_private_ec2.*
+}

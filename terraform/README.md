@@ -19,7 +19,7 @@
 * Elastic IP
 * EC2
 
-![Alt text](./diagrams/TestEnv2az.jpg?raw=true)
+![Alt text](./diagrams/testEnv2az.jpg?raw=true)
 
 ## testEnv1az
 * VPC
@@ -31,7 +31,7 @@
 * Elastic IP
 * EC2
 
-![Alt text](./diagrams/TestEnv1az.jpg?raw=true)
+![Alt text](./diagrams/testEnv1az.jpg?raw=true)
 
 ## testEnv1az clean
 * VPC
@@ -40,5 +40,5 @@
 * Subnets
 * Security Groups
 
-![Alt text](./diagrams/TestEnv1az_clean.jpg?raw=true)
+![Alt text](./diagrams/testEnv1az_clean.jpg?raw=true)
 
