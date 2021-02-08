@@ -106,9 +106,11 @@ module "create_private_route_table_association" {
   route_table_id = module.create_private_route_table.out_route_table_id
 }
 
+# Security Groups
+# Seperated architecture by using the variable sub_seperated_az_architecture
 module "create_public_security_group" {
   source      = "../../resources/security_group/"
-  count       = var.instances_public
+  count       = var.sub_seperated_az_architecture ? 0 : 1
 
   description = "Allow TLS inbound traffic"
   vpc_id      = module.create_vpc.out_vpc_id
@@ -140,7 +142,7 @@ module "create_public_security_group" {
 
 module "create_private_security_group" {
   source      = "../../resources/security_group/"
-  count       = var.instances_private
+  count       = var.sub_seperated_az_architecture ? 0 : 1
 
   description = "Allow TLS inbound traffic"
   vpc_id      = module.create_vpc.out_vpc_id
@@ -154,7 +156,72 @@ module "create_private_security_group" {
       to_port         = line.to_port
       protocol        = line.protocol
       cidr_blocks     = line.cidr_blocks
-      security_groups = [module.create_public_security_group[count.index].out_security_group_id]
+      security_groups = [ for sg in module.create_public_security_group : sg.out_security_group_id]
+    }
+  ]
+
+  outgoing_ports = [
+    for line in var.sg_private_outgoing_ports:
+    {
+      description     = line.description
+      from_port       = line.from_port
+      to_port         = line.to_port
+      protocol        = line.protocol
+      cidr_blocks     = line.cidr_blocks
+      security_groups = []
+    }
+  ]
+}
+
+module "create_public_security_group_seperated" {
+  source      = "../../resources/security_group/"
+  count       = var.sub_seperated_az_architecture ? var.instances_public : 0
+
+  description = "Allow TLS inbound traffic"
+  vpc_id      = module.create_vpc.out_vpc_id
+
+  incoming_ports = [
+    for line in var.sg_public_incoming_ports:
+    {
+      description     = line.description
+      from_port       = line.from_port
+      to_port         = line.to_port
+      protocol        = line.protocol
+      cidr_blocks     = line.cidr_blocks
+      security_groups = []
+    }
+  ]
+
+  outgoing_ports = [
+    for line in var.sg_public_outgoing_ports:
+    {
+      description     = line.description
+      from_port       = line.from_port
+      to_port         = line.to_port
+      protocol        = line.protocol
+      cidr_blocks     = line.cidr_blocks
+      security_groups = []
+    }
+  ]
+}
+
+module "create_private_security_group_seperated" {
+  source      = "../../resources/security_group/"
+  count       = var.sub_seperated_az_architecture ? var.instances_private : 0
+
+  description = "Allow TLS inbound traffic"
+  vpc_id      = module.create_vpc.out_vpc_id
+
+  # Only from the public security group
+  incoming_ports = [
+    for line in var.sg_private_incoming_ports:
+    {
+      description     = line.description
+      from_port       = line.from_port
+      to_port         = line.to_port
+      protocol        = line.protocol
+      cidr_blocks     = line.cidr_blocks
+      security_groups = [module.create_public_security_group_seperated[count.index].out_security_group_id]
     }
   ]
 

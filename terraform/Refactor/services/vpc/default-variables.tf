@@ -52,6 +52,12 @@ variable "sub_private_tags" {
   default     = null
 }
 
+variable "sub_seperated_az_architecture" {
+  description = "Boolean for deploying subnets with seperated az"
+  type        = bool
+  default     = false
+}
+
 ################ Internet Gateway ################
 
 variable "igw_tags" {
