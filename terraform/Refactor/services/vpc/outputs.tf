@@ -5,11 +5,19 @@ output "out_vpc_cidr" {
   value       = module.create_vpc.out_vpc_cidr
 }
 
+output "out_public_subnet_id" {
+  description = "Public subnet ID"
+  value       = module.create_public_subnet.*.out_subnet_id
+}
 output "out_public_subnet_cidr" {
   description = "Public subnet CIDR"
   value       = module.create_public_subnet.*.out_subnet_cidr
 }
 
+output "out_private_subnet_id" {
+  description = "Private subnet ID"
+  value       = module.create_private_subnet.*.out_subnet_id
+}
 output "out_private_subnet_cidr" {
   description = "Private subnet CIDR"
   value       = module.create_private_subnet.*.out_subnet_cidr
