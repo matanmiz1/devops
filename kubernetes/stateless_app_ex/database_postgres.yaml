@@ -1,0 +1,91 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "postgres"
+  namespace: "default"
+  labels:
+    app: "postgres"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "postgres"
+  template:
+    metadata:
+      labels:
+        app: "postgres"
+    spec:
+      containers:
+      - name: "postgres"
+        image: "postgres:latest"
+        env:
+        - name: "POSTGRES_USER"
+          valueFrom:
+            configMapKeyRef:
+              key: "POSTGRES_USER"
+              name: "config"
+        - name: "POSTGRES_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              key: "POSTGRES_PASSWORD"
+              name: "secret-pass"
+        - name: "POSTGRES_PORT"
+          valueFrom:
+            configMapKeyRef:
+              key: "POSTGRES_PORT"
+              name: "config"
+        - name: "POSTGRES_DB"
+          valueFrom:
+            configMapKeyRef:
+              key: "POSTGRES_DB"
+              name: "config"
+        ports:
+          - containerPort: 5432
+            name: postgres
+        volumeMounts:
+          - name: postgres-storage
+            mountPath: /var/lib/postgresql/db-data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "postgres-service"
+  namespace: "default"
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: postgres
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim             # Claim for accessible PV
+metadata:
+  name: postgres-pv-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local                         # Been using local volume on the node itself, manual provision (not dynamic)
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:                             # The path on the node
+    path: "/mnt/data"

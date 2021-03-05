@@ -1,0 +1,15 @@
+configMapGenerator:
+- name: config
+  literals:
+  - POSTGRES_USER=miz
+  - POSTGRES_PORT=5432
+  - POSTGRES_DB=example
+generatorOptions:
+  disableNameSuffixHash: true # Disable adding suffix to the configMap name
+secretGenerator:
+- name: secret-pass
+  literals:
+  - POSTGRES_PASSWORD=abcd1234
+resources:
+  - app_flask.yaml
+  - database_postgres.yaml
